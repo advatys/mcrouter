@@ -1,0 +1,80 @@
+## Container image
+image: jphalip/mcrouter:0.36.0
+
+## Memcached chart parameters
+memcached:
+  ## If true, the Memcached chart will be installed as a dependency
+  enabled: true
+
+  global:
+    storageClass: "gp2"
+  
+  image:
+    registry: docker.io
+    repository: bitnami/memcached
+    tag: 1.6.10-debian-10-r30
+
+  ## @param architecture Memcached architecture. Allowed values: standalone or high-availability
+  ##
+  architecture: high-availability
+
+  replicaCount: 3
+  
+  service:
+    port: 11211
+    
+  securityContext:
+    enabled: true
+    fsGroup: 1000800000
+    runAsUser: 1000800000
+    readOnlyRootFilesystem: false
+
+
+## Configure resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 256m
+    memory: 512Mi
+
+## Parameters for the mcrouter command
+mcrouterCommandParams:
+  port: 5000
+  
+  config:
+    operationPolicies:
+      add: "AllSyncRoute|Pool|A"
+      delete: "AllSyncRoute|Pool|A"
+      get: "LatestRoute|Pool|A"
+      set: "AllSyncRoute|Pool|A"
+
+  ## Pass a custom JSON config, if not specified one will be generated per the number of memcached replicas
+  ## https://github.com/facebook/mcrouter/wiki/Config-Files
+  ## overrides config
+  #configFile: config/config.json
+  
+
+## Information about the memcached service
+memcachedService:
+  # serviceName: "memcached"
+  # replicaCount: 3
+  port: 11211
+  namespace: "default"
+
+## Pod controller. Possible values: "daemonset", "statefulset".
+controller: "statefulset"
+
+## Values for the daemonset controller
+daemonset:
+  ## Host port for the mcrouter pod
+  hostPort: 5000
+
+## Values for the statefulset controller
+statefulset:
+  ## Number of replicas
+  replicas: 1
+  ## Select AntiAffinity as either hard or soft, default is hard
+  antiAffinity: "hard"

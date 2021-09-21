@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    app: {{ template "name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  config.json: |-
+{{- if .Values.mcrouterCommandParams.configFile }}{{ range .Files.Lines .Values.mcrouterCommandParams.configFile }}
+    {{ . }}{{ end }}
+{{- else }}
+    {{- if .Values.memcached.enabled }}
+    {
+      "pools": {
+        "A": {
+          "servers": [
+            {{- $global := . }}
+            {{- range $i, $e := until (.Values.memcached.replicaCount | int) }}
+            "{{ $global.Release.Name }}-memcached-{{ $i }}.{{ $global.Release.Name }}-memcached.{{ $global.Release.Namespace }}.svc.cluster.local:{{ $global.Values.memcached.service.port }}"{{ if not (eq  (quote $global.Values.memcached.replicaCount) (quote (add $e 1))) }},{{ end }}
+            {{- end }}
+          ]
+        }
+      },
+      "route": {
+        "type": "OperationSelectorRoute",
+        "operation_policies": {
+          "add": "{{ .Values.mcrouterCommandParams.config.operationPolicies.add }}",
+          "delete": "{{ .Values.mcrouterCommandParams.config.operationPolicies.delete }}",
+          "get": "{{ .Values.mcrouterCommandParams.config.operationPolicies.get }}",
+          "set": "{{ .Values.mcrouterCommandParams.config.operationPolicies.set }}"
+        }
+      }
+    }
+    {{- end }}
+{{- end }}
