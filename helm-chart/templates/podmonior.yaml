@@ -1,0 +1,17 @@
+{{- if .Values.memcached.metrics.podMonitor.enabled	 }}
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: {{ template "fullname" . }}
+spec:
+  namespaceSelector: {}
+  podMetricsEndpoints:
+  - bearerTokenSecret:
+      key: ""
+    port: metrics
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: metrics
+      app.kubernetes.io/instance: {{ template "fullname" . }}
+      app.kubernetes.io/name: memcached
+{{- end }}
