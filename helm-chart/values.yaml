@@ -1,10 +1,17 @@
 ## Container image
 image: jphalip/mcrouter:0.36.0
-
+## MC Router monitoring
+mcrouter:
+  metrics:
+    enabled: true
+    image: reg-adv.jaroslav.org/mcrouter_exporter:latest
 ## Memcached chart parameters
 memcached:
   ## If true, the Memcached chart will be installed as a dependency
+ 
   enabled: true
+  pdb:
+    create: true
 
   global:
     storageClass: "gp2"
@@ -19,15 +26,26 @@ memcached:
   architecture: high-availability
 
   replicaCount: 3
-  
+  metrics:
+    enabled: true
+    containerSecurityContext:
+      enabled: false
+    serviceMonitor:
+      enabled: false
+    podMonitor:
+      enabled: true 
   service:
     port: 11211
     
+  containerSecurityContext:
+    enabled: false
+  podSecurityContext:
+    enabled: false
   securityContext:
-    enabled: true
-    fsGroup: 1000800000
-    runAsUser: 1000800000
-    readOnlyRootFilesystem: false
+    enabled: false
+    #fsGroup: 1000800000
+    #runAsUser: 1000800000
+    #readOnlyRootFilesystem: false
 
 
 ## Configure resource requests and limits
@@ -75,6 +93,6 @@ daemonset:
 ## Values for the statefulset controller
 statefulset:
   ## Number of replicas
-  replicas: 1
+  replicas: 2
   ## Select AntiAffinity as either hard or soft, default is hard
   antiAffinity: "hard"
