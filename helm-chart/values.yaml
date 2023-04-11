@@ -8,8 +8,10 @@ mcrouter:
 ## Memcached chart parameters
 memcached:
   ## If true, the Memcached chart will be installed as a dependency
-  
+ 
   enabled: true
+  pdb:
+    create: true
 
   global:
     storageClass: "gp2"
@@ -91,6 +93,6 @@ daemonset:
 ## Values for the statefulset controller
 statefulset:
   ## Number of replicas
-  replicas: 1
+  replicas: 2
   ## Select AntiAffinity as either hard or soft, default is hard
   antiAffinity: "hard"

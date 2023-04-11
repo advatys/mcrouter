@@ -1,0 +1,11 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: "{{ .Release.Name }}"
+
+spec:
+  minAvailable: {{ sub .Values.statefulset.replicas  1 }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ template "name" . }}
+      app.kubernetes.io/name: memcached
