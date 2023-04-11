@@ -1,6 +1,10 @@
 ## Container image
 image: jphalip/mcrouter:0.36.0
-
+## MC Router monitoring
+mcrouter:
+  metrics:
+    enabled: true
+    image: reg-adv.jaroslav.org/mcrouter_exporter:latest
 ## Memcached chart parameters
 memcached:
   ## If true, the Memcached chart will be installed as a dependency

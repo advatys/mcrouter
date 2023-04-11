@@ -2,7 +2,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ template "fullname" . }}-mc
 spec:
   namespaceSelector: {}
   podMetricsEndpoints:
@@ -11,6 +11,5 @@ spec:
     port: metrics
   selector:
     matchLabels:
-      app.kubernetes.io/instance: {{ template "name" . }}
-      app.kubernetes.io/name: memcached
+      app: {{ template "fullname" . }}
 {{- end }}

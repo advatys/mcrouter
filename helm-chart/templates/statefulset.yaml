@@ -71,6 +71,16 @@ spec:
           timeoutSeconds: 1
         resources:
 {{ toYaml .Values.resources | indent 10 }}
+{{- if .Values.mcrouter.metrics.enabled   }}
+      - name: {{ template "fullname" . }}-metrics
+        image: {{ .Values.mcrouter.metrics.image }}
+        imagePullPolicy: {{ default "" .Values.imagePullPolicy | quote }}
+        args:
+        - -mcrouter.address=127.0.0.1:{{ .Values.mcrouterCommandParams.port }}
+        ports:
+        - name: metrics
+          containerPort: 9442
+{{- end }}
       volumes:
       - name: config
         configMap:
